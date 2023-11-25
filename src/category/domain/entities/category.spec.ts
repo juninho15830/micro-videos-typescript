@@ -1,10 +1,10 @@
-import { Category } from "./category";
+import { Category, CategoryProperties } from "./category";
 import {omit} from 'lodash';
+import { validate as uuidValidate } from "uuid";
 
 describe("Category Unit Tests", () => {
 
     test("constructor of category", () => {
-        //teste 1
         let category = new Category({ name: "Movie" });
         let props = omit(category.props, "created_at");
         expect(props).toStrictEqual({
@@ -14,7 +14,6 @@ describe("Category Unit Tests", () => {
         });
         expect(category.props.created_at).toBeInstanceOf(Date)
         
-        //teste 2
         let created_at = new Date();
         category = new Category({
             name: "Movie",
@@ -29,8 +28,6 @@ describe("Category Unit Tests", () => {
             created_at,
         });
 
-
-        //teste 3
         category = new Category({
             name: "Movie",
             description: "other description",
@@ -40,8 +37,6 @@ describe("Category Unit Tests", () => {
             description: "other description",
         });
 
-
-        //teste 4
         category = new Category({
             name: "Movie",
             is_active: true,
@@ -51,8 +46,6 @@ describe("Category Unit Tests", () => {
             is_active: true,
         });
 
-
-        //teste 5
         created_at = new Date()
         category = new Category({
             name: "Movie",
@@ -61,6 +54,22 @@ describe("Category Unit Tests", () => {
         expect(category.props).toMatchObject({
             name: "Movie",
             created_at,
+        });
+    });
+
+    test('id field', () => {
+        type CategoryData = { props: CategoryProperties; id?: string};
+        const data: CategoryData[] = [
+            { props: {name: "Movie"} },
+            { props: {name: "Movie"}, id: null },
+            { props: {name: "Movie"}, id: undefined },
+            { props: {name: "Movie"}, id: '61dd8b41-6a34-4454-8989-9f5b0c86b77b'},
+        ];
+
+        data.forEach((i) => {
+            const category = new Category(i.props, i.id);
+            expect(category.id).not.toBeNull();
+            expect(uuidValidate(category.id)).toBeTruthy();
         });
     });
 
@@ -85,6 +94,7 @@ describe("Category Unit Tests", () => {
             name: 'Movie',
         });
 
+        //Para acessar o teste do set privado devemos atribuir os [] como objeto para a propriedade.
         category["description"] = "other description";
         expect(category.description).toBe('other description');
 
